@@ -11,17 +11,10 @@ import os
 import platform
 import time
 
-# 根据操作系统设置合适的中文字体
-system = platform.system()
-if system == 'Windows':
-    plt.rcParams['font.sans-serif'] = ['Microsoft YaHei', 'SimHei']  # Windows的中文字体
-elif system == 'Darwin':  # macOS
-    plt.rcParams['font.sans-serif'] = ['Arial Unicode MS', 'PingFang HK']
-else:  # Linux
-    plt.rcParams['font.sans-serif'] = ['WenQuanYi Micro Hei', 'DejaVu Sans']
 
+plt.rcParams['font.sans-serif'] = ['Arial Unicode MS']
 plt.rcParams['axes.unicode_minus'] = False
-plt.rcParams['font.family'] = 'sans-serif'  # 设置默认字体族
+
 # 设置页面配置
 st.set_page_config(
     page_title="二十一点交互式模拟",
@@ -240,16 +233,16 @@ def generate_probability_chart(player_value):
     fig, ax = plt.subplots(figsize=(8, 4))
     
     # 绘制爆牌概率
-    ax.bar(["爆牌概率"], [bust_prob], alpha=0.7, color='#ff9999')
+    ax.bar(["Bust Probability"], [bust_prob], alpha=0.7, color='#ff9999')
     
     # 在右侧Y轴绘制要牌后的期望值
     ax2 = ax.twinx()
-    ax2.bar(["要牌期望值"], [hit_expected], alpha=0.7, color='#3366cc')
+    ax2.bar(["Expected Value"], [hit_expected], alpha=0.7, color='#3366cc')
     
     # 添加标签
-    ax.set_ylabel('爆牌概率 (%)', fontsize=10)
-    ax2.set_ylabel('要牌后期望值', fontsize=10)
-    ax.set_title(f'当前点数 {player_value} 的决策分析', fontsize=12, pad=20)
+    ax.set_ylabel('Bust Probability (%)', fontsize=10)
+    ax2.set_ylabel('Expected Value After Hit', fontsize=10)
+    ax.set_title(f'Decision Analysis for Current Points: {player_value}', fontsize=12, pad=20)
     
     # 设置Y轴范围
     ax.set_ylim(0, 100)
@@ -270,11 +263,11 @@ def generate_win_probability_chart(player_value, dealer_card):
     fig, ax = plt.subplots(figsize=(8, 4))
     
     # 绘制胜率
-    ax.bar(["当前胜率"], [win_prob], alpha=0.7, color='#66b3ff')
+    ax.bar(["Win Probability"], [win_prob], alpha=0.7, color='#66b3ff')
     
     # 添加标签
-    ax.set_ylabel('胜率 (%)', fontsize=10)
-    ax.set_title(f'当前局面胜率分析', fontsize=12, pad=20)
+    ax.set_ylabel('Win Probability (%)', fontsize=10)
+    ax.set_title(f'Current Situation Win Probability Analysis', fontsize=12, pad=20)
     
     # 设置Y轴范围
     ax.set_ylim(0, 100)
@@ -342,13 +335,13 @@ def main():
     if len(st.session_state.capital_history) > 1:
         st.sidebar.subheader("资本变化")
         capital_df = pd.DataFrame({
-            "局数": range(len(st.session_state.capital_history)),
-            "资本": st.session_state.capital_history
+            "Round": range(len(st.session_state.capital_history)),
+            "Capital": st.session_state.capital_history
         })
         fig, ax = plt.subplots(figsize=(4, 2))
-        ax.plot(capital_df["局数"], capital_df["资本"], marker='o', markersize=3)
-        ax.set_xlabel("局数")
-        ax.set_ylabel("资本 (元)")
+        ax.plot(capital_df["Round"], capital_df["Capital"], marker='o', markersize=3)
+        ax.set_xlabel("Round")
+        ax.set_ylabel("Capital")
         ax.grid(True, alpha=0.3)
         st.sidebar.pyplot(fig)
     
