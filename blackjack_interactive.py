@@ -10,18 +10,18 @@ import io
 import os
 import platform
 import time
-from matplotlib.font_manager import FontProperties  # 导入FontProperties
 
 # 根据操作系统设置合适的中文字体
 system = platform.system()
 if system == 'Windows':
-    plt.rcParams['font.sans-serif'] = ['SimHei']  # Windows的中文黑体
+    plt.rcParams['font.sans-serif'] = ['Microsoft YaHei', 'SimHei']  # Windows的中文字体
 elif system == 'Darwin':  # macOS
-    plt.rcParams['font.sans-serif'] = ['PingFang HK', 'Arial Unicode MS']
+    plt.rcParams['font.sans-serif'] = ['Arial Unicode MS', 'PingFang HK']
 else:  # Linux
-    plt.rcParams['font.sans-serif'] = ['WenQuanYi Micro Hei']
+    plt.rcParams['font.sans-serif'] = ['WenQuanYi Micro Hei', 'DejaVu Sans']
 
 plt.rcParams['axes.unicode_minus'] = False
+plt.rcParams['font.family'] = 'sans-serif'  # 设置默认字体族
 # 设置页面配置
 st.set_page_config(
     page_title="二十一点交互式模拟",
@@ -236,21 +236,20 @@ def generate_probability_chart(player_value):
     """生成当前点数的概率图表"""
     bust_prob = calculate_bust_probability(player_value)
     hit_expected = calculate_hit_expected_value(player_value)
-    font = FontProperties(fname='Arial Unicode MS', size=14) 
     plt.style.use('default')  # 使用默认样式
     fig, ax = plt.subplots(figsize=(8, 4))
     
     # 绘制爆牌概率
-    ax.bar(["爆牌概率"], [bust_prob], alpha=0.7, color='#ff9999', fontproperties=font)
+    ax.bar(["爆牌概率"], [bust_prob], alpha=0.7, color='#ff9999')
     
     # 在右侧Y轴绘制要牌后的期望值
     ax2 = ax.twinx()
-    ax2.bar(["要牌期望值"], [hit_expected], alpha=0.7, color='#3366cc', fontproperties=font)
+    ax2.bar(["要牌期望值"], [hit_expected], alpha=0.7, color='#3366cc')
     
     # 添加标签
-    ax.set_ylabel('爆牌概率 (%)', fontsize=10, fontproperties=font)
-    ax2.set_ylabel('要牌后期望值', fontsize=10, fontproperties=font)
-    ax.set_title(f'当前点数 {player_value} 的决策分析', fontsize=12, pad=20, fontproperties=font)
+    ax.set_ylabel('爆牌概率 (%)', fontsize=10)
+    ax2.set_ylabel('要牌后期望值', fontsize=10)
+    ax.set_title(f'当前点数 {player_value} 的决策分析', fontsize=12, pad=20)
     
     # 设置Y轴范围
     ax.set_ylim(0, 100)
@@ -267,22 +266,21 @@ def generate_probability_chart(player_value):
 def generate_win_probability_chart(player_value, dealer_card):
     """生成当前局面的胜率图表"""
     win_prob = calculate_win_probability(player_value, dealer_card)
-    font = FontProperties(fname='Arial Unicode MS', size=14) 
     plt.style.use('default')  # 使用默认样式
     fig, ax = plt.subplots(figsize=(8, 4))
     
     # 绘制胜率
-    ax.bar(["当前胜率"], [win_prob], alpha=0.7, color='#66b3ff', fontproperties=font)
+    ax.bar(["当前胜率"], [win_prob], alpha=0.7, color='#66b3ff')
     
     # 添加标签
-    ax.set_ylabel('胜率 (%)', fontsize=10, fontproperties=font)
-    ax.set_title(f'当前局面胜率分析', fontsize=12, pad=20, fontproperties=font)
+    ax.set_ylabel('胜率 (%)', fontsize=10)
+    ax.set_title(f'当前局面胜率分析', fontsize=12, pad=20)
     
     # 设置Y轴范围
     ax.set_ylim(0, 100)
     
     # 添加数值标签
-    ax.text(0, win_prob + 2, f"{win_prob:.1f}%", ha='center', fontsize=10, fontproperties=font)
+    ax.text(0, win_prob + 2, f"{win_prob:.1f}%", ha='center', fontsize=10)
     
     plt.tight_layout()
     return fig
