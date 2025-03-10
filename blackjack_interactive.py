@@ -8,6 +8,7 @@ import base64
 from PIL import Image
 import io
 import os
+
 plt.rcParams['font.sans-serif'] = ['Arial Unicode MS']
 plt.rcParams['axes.unicode_minus'] = False
 # 设置页面配置
@@ -360,7 +361,7 @@ def main():
                     st.session_state.dealer_hand = [st.session_state.deck.deal(), st.session_state.deck.deal()]
                     st.session_state.game_active = True
                     st.session_state.game_result = None
-                    st.experimental_rerun()
+                    st.rerun()
         
         # 显示游戏状态
         if st.session_state.game_active:
@@ -410,7 +411,7 @@ def main():
                         st.session_state.dealer_hand = [st.session_state.deck.deal(), st.session_state.deck.deal()]
                         st.session_state.game_active = True
                         st.session_state.game_result = None
-                        st.experimental_rerun()
+                        st.rerun()
             else:
                 # 游戏进行中，显示操作按钮
                 col_hit, col_stand = st.columns(2)
@@ -429,7 +430,7 @@ def main():
                             st.session_state.games_lost += 1
                             st.session_state.capital -= bet_amount
                             st.session_state.capital_history.append(st.session_state.capital)
-                            st.experimental_rerun()
+                            st.rerun()
                 
                 with col_stand:
                     if st.button("停牌 (Stand)", key="stand"):
@@ -462,7 +463,7 @@ def main():
                         
                         st.session_state.games_played += 1
                         st.session_state.capital_history.append(st.session_state.capital)
-                        st.experimental_rerun()
+                        st.rerun()
     
     with col2:
         # 概率和决策分析区域
