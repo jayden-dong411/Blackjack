@@ -241,16 +241,20 @@ def generate_probability_chart(player_value):
     fig, ax = plt.subplots(figsize=(8, 4))
     
     # 绘制爆牌概率
-    ax.bar(["爆牌概率"], [bust_prob], alpha=0.7, color='#ff9999', fontproperties=font)
+    ax.bar(["爆牌概率"], [bust_prob], alpha=0.7, color='#ff9999')
     
     # 在右侧Y轴绘制要牌后的期望值
     ax2 = ax.twinx()
-    ax2.bar(["要牌期望值"], [hit_expected], alpha=0.7, color='#3366cc', fontproperties=font)
+    ax2.bar(["要牌期望值"], [hit_expected], alpha=0.7, color='#3366cc')
     
     # 添加标签
-    ax.set_ylabel('爆牌概率 (%)', fontsize=10, fontproperties=font)
-    ax2.set_ylabel('要牌后期望值', fontsize=10, fontproperties=font)
-    ax.set_title(f'当前点数 {player_value} 的决策分析', fontsize=12, pad=20, fontproperties=font)
+    ax.set_ylabel('爆牌概率 (%)', fontproperties=font, fontsize=10)
+    ax2.set_ylabel('要牌后期望值', fontproperties=font, fontsize=10)
+    ax.set_title(f'当前点数 {player_value} 的决策分析', fontproperties=font, fontsize=12, pad=20)
+    
+    # 设置X轴标签字体
+    ax.set_xticklabels(["爆牌概率"], fontproperties=font)
+    ax2.set_xticklabels(["要牌期望值"], fontproperties=font)
     
     # 设置Y轴范围
     ax.set_ylim(0, 100)
@@ -272,17 +276,20 @@ def generate_win_probability_chart(player_value, dealer_card):
     fig, ax = plt.subplots(figsize=(8, 4))
     
     # 绘制胜率
-    ax.bar(["当前胜率"], [win_prob], alpha=0.7, color='#66b3ff', fontproperties=font)
+    ax.bar(["当前胜率"], [win_prob], alpha=0.7, color='#66b3ff')
     
     # 添加标签
-    ax.set_ylabel('胜率 (%)', fontsize=10, fontproperties=font)
-    ax.set_title(f'当前局面胜率分析', fontsize=12, pad=20, fontproperties=font)
+    ax.set_ylabel('胜率 (%)', fontproperties=font, fontsize=10)
+    ax.set_title(f'当前局面胜率分析', fontproperties=font, fontsize=12, pad=20)
+    
+    # 设置X轴标签字体
+    ax.set_xticklabels(["当前胜率"], fontproperties=font)
     
     # 设置Y轴范围
     ax.set_ylim(0, 100)
     
     # 添加数值标签
-    ax.text(0, win_prob + 2, f"{win_prob:.1f}%", ha='center', fontsize=10, fontproperties=font)
+    ax.text(0, win_prob + 2, f"{win_prob:.1f}%", ha='center', fontsize=10)
     
     plt.tight_layout()
     return fig
