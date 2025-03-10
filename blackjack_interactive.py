@@ -487,7 +487,7 @@ def main():
 
                 # 显示庄家行动对话框
                 if st.session_state.show_dealer_dialog:
-                    with st.dialog("庄家行动过程", on_close=lambda: setattr(st.session_state, 'show_dealer_dialog', False)):
+                    with st.dialog("庄家行动过程"):
                         # 显示庄家完整手牌
                         st.markdown("庄家手牌：")
                         st.markdown(display_hand(st.session_state.dealer_hand), unsafe_allow_html=True)
@@ -497,6 +497,11 @@ def main():
                         for action in st.session_state.dealer_actions:
                             st.write(action)
                             time.sleep(0.5)  # 逐步显示庄家行动
+                        
+                        # 添加关闭按钮
+                        if st.button("关闭", key="close_dialog"):
+                            st.session_state.show_dealer_dialog = False
+                            st.rerun()
                 
                 # 如果庄家已完成行动但游戏还未结束，显示"显示最终结果"按钮
                 if st.session_state.dealer_finished and st.session_state.game_result is None:
