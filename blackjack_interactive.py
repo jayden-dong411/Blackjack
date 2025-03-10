@@ -331,8 +331,6 @@ def main():
         st.session_state.games_tied = 0
     if 'capital_history' not in st.session_state:
         st.session_state.capital_history = [initial_capital]
-    if 'dealer_finished' not in st.session_state:
-        st.session_state.dealer_finished = False
     
     # 显示统计信息
     st.sidebar.metric("当前资本", f"{st.session_state.capital} 元")
@@ -490,15 +488,8 @@ def main():
                         st.markdown(display_hand(st.session_state.dealer_hand), unsafe_allow_html=True)
                         st.write(f"庄家最终点数: {dealer_value}")
                         
-                        st.session_state.dealer_finished = True
-                        st.rerun()
-
-                # 如果庄家已完成行动但游戏还未结束，显示"显示最终结果"按钮
-                if st.session_state.dealer_finished and st.session_state.game_result is None:
-                    if st.button("显示最终结果", key="show_result"):
                         # 判定胜负
                         player_value = calculate_hand_value(st.session_state.player_hand)
-                        dealer_value = calculate_hand_value(st.session_state.dealer_hand)
                         
                         if dealer_value > 21:  # 庄家爆牌，玩家获得双倍赌注
                             st.session_state.game_result = "win"
@@ -525,8 +516,11 @@ def main():
                             st.info("平局！")
                         
                         st.session_state.games_played += 1
-                        st.session_state.dealer_finished = False  # 重置状态
-                        st.rerun()
+                        
+                        # 使用 spinner 来提供更好的视觉反馈
+                        with st.spinner("更新游戏状态..."):
+                            time.sleep(1)  # 给用户更多时间看结果
+                            st.rerun()
     
     with col2:
         # 概率和决策分析区域
