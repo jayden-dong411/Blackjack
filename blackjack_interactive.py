@@ -331,10 +331,6 @@ def main():
         st.session_state.games_tied = 0
     if 'capital_history' not in st.session_state:
         st.session_state.capital_history = [initial_capital]
-    if 'dealer_action_complete' not in st.session_state:
-        st.session_state.dealer_action_complete = False
-    if 'dealer_action_shown' not in st.session_state:
-        st.session_state.dealer_action_shown = False
     
     # 显示统计信息
     st.sidebar.metric("当前资本", f"{st.session_state.capital} 元")
@@ -459,7 +455,7 @@ def main():
                             st.rerun()
                 
                 with col_stand:
-                    if st.button("停牌 (Stand)", key="stand") and not st.session_state.dealer_action_shown and not st.session_state.dealer_action_complete:
+                    if st.button("停牌 (Stand)", key="stand"):
                         # 玩家停牌，庄家开始行动
                         dealer_value = calculate_hand_value(st.session_state.dealer_hand)
                         
@@ -478,37 +474,22 @@ def main():
                             # 记录庄家要牌动作
                             dealer_actions.append(f"庄家要了一张牌: {new_dealer_card}, 当前点数: {dealer_value}")
                         
-                        # 保存庄家行动到session state
-                        st.session_state.dealer_actions = dealer_actions
-                        st.session_state.dealer_value = dealer_value
-                        st.session_state.dealer_action_shown = True
-                        st.rerun()
-                    
-                    # 显示庄家要牌过程
-                    if st.session_state.dealer_action_shown and not st.session_state.dealer_action_complete:
                         # 显示庄家要牌过程
-                        if hasattr(st.session_state, 'dealer_actions') and st.session_state.dealer_actions:
+                        if dealer_actions:
                             st.markdown("庄家要牌过程：")
-                            for action in st.session_state.dealer_actions:
+                            for action in dealer_actions:
                                 st.write(action)
+                                time.sleep(0.5) # 逐步显示庄家行动
                         else:
                             st.write("庄家不需要要牌")
                         
-                        # 显示继续按钮
-                        if st.button("继续", key="continue"):
-                            st.session_state.dealer_action_complete = True
-                            st.rerun()
-                    
-                    # 当庄家行动完成后显示最终结果
-                    if st.session_state.dealer_action_complete:
                         # 显示最终手牌
                         st.markdown("庄家最终手牌：")
                         st.markdown(display_hand(st.session_state.dealer_hand), unsafe_allow_html=True)
-                        st.write(f"庄家最终点数: {st.session_state.dealer_value}")
+                        st.write(f"庄家最终点数: {dealer_value}")
                         
                         # 判定胜负
                         player_value = calculate_hand_value(st.session_state.player_hand)
-                        dealer_value = st.session_state.dealer_value
                         
                         if dealer_value > 21:  # 庄家爆牌，玩家获得双倍赌注
                             st.session_state.game_result = "win"
@@ -536,16 +517,9 @@ def main():
                         
                         st.session_state.games_played += 1
                         
-                        # 添加新游戏按钮
-                        if st.button("开始新游戏", key="new_game"):
-                            st.session_state.dealer_action_shown = False
-                            st.session_state.dealer_action_complete = False
-                            if hasattr(st.session_state, 'dealer_actions'):
-                                delattr(st.session_state, 'dealer_actions')
-                            st.session_state.game_result = None
-                            st.session_state.player_hand = []
-                            st.session_state.dealer_hand = []
-                            st.session_state.deck.reset()
+                        # 使用 spinner 来提供更好的视觉反馈
+                        with st.spinner("更新游戏状态..."):
+                            time.sleep(1)  # 给用户更多时间看结果
                             st.rerun()
     
     with col2:
