@@ -331,12 +331,6 @@ def main():
         st.session_state.games_tied = 0
     if 'capital_history' not in st.session_state:
         st.session_state.capital_history = [initial_capital]
-    if 'dealer_finished' not in st.session_state:
-        st.session_state.dealer_finished = False
-    if 'show_dealer_dialog' not in st.session_state:
-        st.session_state.show_dealer_dialog = False
-    if 'dealer_actions' not in st.session_state:
-        st.session_state.dealer_actions = []
     
     # 显示统计信息
     st.sidebar.metric("当前资本", f"{st.session_state.capital} 元")
@@ -465,47 +459,35 @@ def main():
                         # 玩家停牌，庄家开始行动
                         dealer_value = calculate_hand_value(st.session_state.dealer_hand)
                         
-                        # 庄家按规则要牌
-                        st.session_state.dealer_actions = []
-                        st.session_state.dealer_actions.append(f"庄家初始手牌点数: {dealer_value}")
+                        # 显示庄家完整手牌
+                        st.markdown("庄家手牌：")
+                        st.markdown(display_hand(st.session_state.dealer_hand), unsafe_allow_html=True)
+                        st.write(f"庄家初始点数: {dealer_value}")
                         
+                        # 庄家按规则要牌
+                        dealer_actions = []
                         while dealer_strategy(dealer_value):
                             new_dealer_card = st.session_state.deck.deal()
                             st.session_state.dealer_hand.append(new_dealer_card)
                             dealer_value = calculate_hand_value(st.session_state.dealer_hand)
                             
                             # 记录庄家要牌动作
-                            st.session_state.dealer_actions.append(f"庄家要了一张牌: {new_dealer_card}, 当前点数: {dealer_value}")
+                            dealer_actions.append(f"庄家要了一张牌: {new_dealer_card}, 当前点数: {dealer_value}")
                         
-                        if len(st.session_state.dealer_actions) == 1:
-                            st.session_state.dealer_actions.append("庄家不需要要牌")
-                            
-                        st.session_state.dealer_actions.append(f"庄家最终点数: {dealer_value}")
-                        st.session_state.show_dealer_dialog = True
-                        st.session_state.dealer_finished = True
-                        st.rerun()
-
-                # 显示庄家行动对话框
-                if st.session_state.show_dealer_dialog:
-                    with st.dialog("庄家行动过程"):
-                        # 显示庄家完整手牌
-                        st.markdown("庄家手牌：")
+                        # 显示庄家要牌过程
+                        if dealer_actions:
+                            st.markdown("庄家要牌过程：")
+                            for action in dealer_actions:
+                                st.write(action)
+                                time.sleep(0.5)  # 逐步显示庄家行动
+                        else:
+                            st.write("庄家不需要要牌")
+                        
+                        # 显示最终手牌
+                        st.markdown("庄家最终手牌：")
                         st.markdown(display_hand(st.session_state.dealer_hand), unsafe_allow_html=True)
+                        st.write(f"庄家最终点数: {dealer_value}")
                         
-                        # 显示庄家行动过程
-                        st.markdown("### 庄家行动详情")
-                        for action in st.session_state.dealer_actions:
-                            st.write(action)
-                            time.sleep(0.5)  # 逐步显示庄家行动
-                        
-                        # 添加关闭按钮
-                        if st.button("关闭", key="close_dialog"):
-                            st.session_state.show_dealer_dialog = False
-                            st.rerun()
-                
-                # 如果庄家已完成行动但游戏还未结束，显示"显示最终结果"按钮
-                if st.session_state.dealer_finished and st.session_state.game_result is None:
-                    if st.button("显示最终结果", key="show_result"):
                         # 判定胜负
                         player_value = calculate_hand_value(st.session_state.player_hand)
                         
