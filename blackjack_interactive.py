@@ -9,8 +9,14 @@ from PIL import Image
 import io
 import os
 
-plt.rcParams['font.sans-serif'] = ['Arial Unicode MS']
-plt.rcParams['axes.unicode_minus'] = False
+# 根据操作系统设置合适的中文字体
+system = platform.system()
+if system == 'Windows':
+    plt.rcParams['font.sans-serif'] = ['SimHei']  # Windows的中文黑体
+elif system == 'Darwin':  # macOS
+    plt.rcParams['font.sans-serif'] = ['PingFang HK', 'Arial Unicode MS']
+else:  # Linux
+    plt.rcParams['font.sans-serif'] = ['WenQuanYi Micro Hei']
 # 设置页面配置
 st.set_page_config(
     page_title="二十一点交互式模拟",
@@ -221,7 +227,9 @@ def display_hand(hand, hide_first=False):
     return html
 
 # 生成图表的函数
+    
 def generate_probability_chart(player_value):
+    
     """生成当前点数的概率图表"""
     bust_prob = calculate_bust_probability(player_value)
     hit_expected = calculate_hit_expected_value(player_value)
@@ -250,7 +258,8 @@ def generate_probability_chart(player_value):
     
     plt.tight_layout()
     return fig
-
+plt.rcParams['font.sans-serif'] = ['Arial Unicode MS']
+plt.rcParams['axes.unicode_minus'] = False
 # 生成胜率图表
 def generate_win_probability_chart(player_value, dealer_card):
     """生成当前局面的胜率图表"""
