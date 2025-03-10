@@ -459,102 +459,67 @@ def main():
                         # 玩家停牌，庄家开始行动
                         dealer_value = calculate_hand_value(st.session_state.dealer_hand)
                         
-                        # 创建一个弹出式界面来展示庄家行动
-                        with st.spinner("庄家正在行动..."):
-                            # 将庄家行动过程保存到session_state中
-                            st.session_state.dealer_actions = []
-                            st.session_state.dealer_initial_value = dealer_value
-                            st.session_state.dealer_initial_hand = st.session_state.dealer_hand.copy()
-                            
-                            # 庄家按规则要牌
-                            while dealer_strategy(dealer_value):
-                                new_dealer_card = st.session_state.deck.deal()
-                                st.session_state.dealer_hand.append(new_dealer_card)
-                                dealer_value = calculate_hand_value(st.session_state.dealer_hand)
-                                
-                                # 记录庄家要牌动作
-                                st.session_state.dealer_actions.append({
-                                    "card": new_dealer_card,
-                                    "value": dealer_value
-                                })
-                            
-                            # 判定胜负
-                            player_value = calculate_hand_value(st.session_state.player_hand)
-                            
-                            if dealer_value > 21:  # 庄家爆牌，玩家获得双倍赌注
-                                st.session_state.game_result = "win"
-                                st.session_state.games_won += 1
-                                st.session_state.capital += bet_amount * 2  # 双倍赌注
-                                st.session_state.capital_history.append(st.session_state.capital)
-                                st.session_state.result_message = "庄家爆牌，你赢了双倍赌注！"
-                            elif player_value > dealer_value:  # 玩家点数大于庄家
-                                st.session_state.game_result = "win"
-                                st.session_state.games_won += 1
-                                st.session_state.capital += bet_amount
-                                st.session_state.capital_history.append(st.session_state.capital)
-                                st.session_state.result_message = "你赢了！"
-                            elif player_value < dealer_value:  # 玩家点数小于庄家
-                                st.session_state.game_result = "lose"
-                                st.session_state.games_lost += 1
-                                st.session_state.capital -= bet_amount
-                                st.session_state.capital_history.append(st.session_state.capital)
-                                st.session_state.result_message = "你输了！"
-                            else:  # 平局
-                                st.session_state.game_result = "tie"
-                                st.session_state.games_tied += 1
-                                st.session_state.capital_history.append(st.session_state.capital)
-                                st.session_state.result_message = "平局！"
-                            
-                            st.session_state.games_played += 1
-                            st.session_state.show_dealer_actions = True
-                            
-                        # 重新加载页面以显示弹出窗口
-                        st.rerun()
-                
-                # 显示庄家行动过程的弹出窗口
-                if st.session_state.get('show_dealer_actions', False):
-                    dealer_modal = st.container()
-                    with dealer_modal:
-                        st.subheader("庄家行动过程")
-                        col1, col2 = st.columns([1, 1])
+                        # 显示庄家完整手牌
+                        st.markdown("庄家手牌：")
+                        st.markdown(display_hand(st.session_state.dealer_hand), unsafe_allow_html=True)
+                        st.write(f"庄家初始点数: {dealer_value}")
                         
-                        with col1:
-                            st.markdown("### 庄家初始手牌")
-                            st.markdown(display_hand(st.session_state.dealer_initial_hand), unsafe_allow_html=True)
-                            st.write(f"初始点数: {st.session_state.dealer_initial_value}")
-                        
-                        with col2:
-                            st.markdown("### 庄家最终手牌")
-                            st.markdown(display_hand(st.session_state.dealer_hand), unsafe_allow_html=True)
-                            st.write(f"最终点数: {calculate_hand_value(st.session_state.dealer_hand)}")
+                        # 庄家按规则要牌
+                        dealer_actions = []
+                        while dealer_strategy(dealer_value):
+                            new_dealer_card = st.session_state.deck.deal()
+                            st.session_state.dealer_hand.append(new_dealer_card)
+                            dealer_value = calculate_hand_value(st.session_state.dealer_hand)
+                            
+                            # 记录庄家要牌动作
+                            dealer_actions.append(f"庄家要了一张牌: {new_dealer_card}, 当前点数: {dealer_value}")
                         
                         # 显示庄家要牌过程
-                        if st.session_state.dealer_actions:
-                            st.markdown("### 庄家要牌过程")
-                            for i, action in enumerate(st.session_state.dealer_actions, 1):
-                                with st.container():
-                                    cols = st.columns([1, 3, 2])
-                                    with cols[0]:
-                                        st.write(f"第 {i} 张:")
-                                    with cols[1]:
-                                        st.markdown(display_card(action["card"]), unsafe_allow_html=True)
-                                    with cols[2]:
-                                        st.write(f"当前点数: {action['value']}")
+                        if dealer_actions:
+                            st.markdown("庄家要牌过程：")
+                            for action in dealer_actions:
+                                st.write(action)
+                                time.sleep(0.5)  # 逐步显示庄家行动
                         else:
                             st.write("庄家不需要要牌")
                         
-                        # 显示游戏结果
-                        st.markdown("---")
-                        if st.session_state.game_result == "win":
-                            st.success(st.session_state.result_message)
-                        elif st.session_state.game_result == "lose":
-                            st.error(st.session_state.result_message)
-                        else:
-                            st.info(st.session_state.result_message)
+                        # 显示最终手牌
+                        st.markdown("庄家最终手牌：")
+                        st.markdown(display_hand(st.session_state.dealer_hand), unsafe_allow_html=True)
+                        st.write(f"庄家最终点数: {dealer_value}")
                         
-                        # 关闭按钮
-                        if st.button("关闭", key="close_dealer_actions"):
-                            st.session_state.show_dealer_actions = False
+                        # 判定胜负
+                        player_value = calculate_hand_value(st.session_state.player_hand)
+                        
+                        if dealer_value > 21:  # 庄家爆牌，玩家获得双倍赌注
+                            st.session_state.game_result = "win"
+                            st.session_state.games_won += 1
+                            st.session_state.capital += bet_amount * 2  # 双倍赌注
+                            st.session_state.capital_history.append(st.session_state.capital)
+                            st.success("庄家爆牌，你赢了双倍赌注！")
+                        elif player_value > dealer_value:  # 玩家点数大于庄家
+                            st.session_state.game_result = "win"
+                            st.session_state.games_won += 1
+                            st.session_state.capital += bet_amount
+                            st.session_state.capital_history.append(st.session_state.capital)
+                            st.success("你赢了！")
+                        elif player_value < dealer_value:  # 玩家点数小于庄家
+                            st.session_state.game_result = "lose"
+                            st.session_state.games_lost += 1
+                            st.session_state.capital -= bet_amount
+                            st.session_state.capital_history.append(st.session_state.capital)
+                            st.error("你输了！")
+                        else:  # 平局
+                            st.session_state.game_result = "tie"
+                            st.session_state.games_tied += 1
+                            st.session_state.capital_history.append(st.session_state.capital)
+                            st.info("平局！")
+                        
+                        st.session_state.games_played += 1
+                        
+                        # 使用 spinner 来提供更好的视觉反馈
+                        with st.spinner("更新游戏状态..."):
+                            time.sleep(1)  # 给用户更多时间看结果
                             st.rerun()
     
     with col2:
