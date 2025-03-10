@@ -9,8 +9,18 @@ from PIL import Image
 import io
 import os
 import platform
+import time
 
+# 根据操作系统设置合适的中文字体
+system = platform.system()
+if system == 'Windows':
+    plt.rcParams['font.sans-serif'] = ['SimHei']  # Windows的中文黑体
+elif system == 'Darwin':  # macOS
+    plt.rcParams['font.sans-serif'] = ['PingFang HK', 'Arial Unicode MS']
+else:  # Linux
+    plt.rcParams['font.sans-serif'] = ['WenQuanYi Micro Hei']
 
+plt.rcParams['axes.unicode_minus'] = False
 # 设置页面配置
 st.set_page_config(
     page_title="二十一点交互式模拟",
@@ -221,20 +231,12 @@ def display_hand(hand, hide_first=False):
     return html
 
 # 生成图表的函数
-    
 def generate_probability_chart(player_value):
-    # 根据操作系统设置合适的中文字体
-    system = platform.system()
-    if system == 'Windows':
-        plt.rcParams['font.sans-serif'] = ['SimHei']  # Windows的中文黑体
-    elif system == 'Darwin':  # macOS
-        plt.rcParams['font.sans-serif'] = ['PingFang HK', 'Arial Unicode MS']
-    else:  # Linux
-        plt.rcParams['font.sans-serif'] = ['WenQuanYi Micro Hei']
     """生成当前点数的概率图表"""
     bust_prob = calculate_bust_probability(player_value)
     hit_expected = calculate_hit_expected_value(player_value)
     
+    plt.style.use('default')  # 使用默认样式
     fig, ax = plt.subplots(figsize=(8, 4))
     
     # 绘制爆牌概率
@@ -245,48 +247,41 @@ def generate_probability_chart(player_value):
     ax2.bar(["要牌期望值"], [hit_expected], alpha=0.7, color='#3366cc')
     
     # 添加标签
-    ax.set_ylabel('爆牌概率 (%)')
-    ax2.set_ylabel('要牌后期望值')
-    ax.set_title(f'当前点数 {player_value} 的决策分析')
+    ax.set_ylabel('爆牌概率 (%)', fontsize=10)
+    ax2.set_ylabel('要牌后期望值', fontsize=10)
+    ax.set_title(f'当前点数 {player_value} 的决策分析', fontsize=12, pad=20)
     
     # 设置Y轴范围
     ax.set_ylim(0, 100)
     ax2.set_ylim(0, 21)
     
     # 添加数值标签
-    ax.text(0, bust_prob + 2, f"{bust_prob:.1f}%", ha='center')
-    ax2.text(0, hit_expected + 0.5, f"{hit_expected:.1f}", ha='center', color='#3366cc')
+    ax.text(0, bust_prob + 2, f"{bust_prob:.1f}%", ha='center', fontsize=10)
+    ax2.text(0, hit_expected + 0.5, f"{hit_expected:.1f}", ha='center', color='#3366cc', fontsize=10)
     
     plt.tight_layout()
     return fig
 
 # 生成胜率图表
 def generate_win_probability_chart(player_value, dealer_card):
-    # 根据操作系统设置合适的中文字体
-    system = platform.system()
-    if system == 'Windows':
-        plt.rcParams['font.sans-serif'] = ['SimHei']  # Windows的中文黑体
-    elif system == 'Darwin':  # macOS
-        plt.rcParams['font.sans-serif'] = ['PingFang HK', 'Arial Unicode MS']
-    else:  # Linux
-        plt.rcParams['font.sans-serif'] = ['WenQuanYi Micro Hei']
     """生成当前局面的胜率图表"""
     win_prob = calculate_win_probability(player_value, dealer_card)
     
+    plt.style.use('default')  # 使用默认样式
     fig, ax = plt.subplots(figsize=(8, 4))
     
     # 绘制胜率
     ax.bar(["当前胜率"], [win_prob], alpha=0.7, color='#66b3ff')
     
     # 添加标签
-    ax.set_ylabel('胜率 (%)')
-    ax.set_title(f'当前局面胜率分析')
+    ax.set_ylabel('胜率 (%)', fontsize=10)
+    ax.set_title(f'当前局面胜率分析', fontsize=12, pad=20)
     
     # 设置Y轴范围
     ax.set_ylim(0, 100)
     
     # 添加数值标签
-    ax.text(0, win_prob + 2, f"{win_prob:.1f}%", ha='center')
+    ax.text(0, win_prob + 2, f"{win_prob:.1f}%", ha='center', fontsize=10)
     
     plt.tight_layout()
     return fig
@@ -436,8 +431,14 @@ def main():
                 with col_hit:
                     if st.button("要牌 (Hit)", key="hit"):
                         # 玩家要牌
-                        st.session_state.player_hand.append(st.session_state.deck.deal())
+                        new_card = st.session_state.deck.deal()
+                        st.session_state.player_hand.append(new_card)
                         player_value = calculate_hand_value(st.session_state.player_hand)
+                        
+                        # 显示更新后的手牌
+                        st.markdown("玩家手牌更新：")
+                        st.markdown(display_hand(st.session_state.player_hand), unsafe_allow_html=True)
+                        st.write(f"当前点数: {player_value}")
                         
                         # 检查是否爆牌
                         if player_value > 21:
@@ -447,6 +448,11 @@ def main():
                             st.session_state.games_lost += 1
                             st.session_state.capital -= bet_amount
                             st.session_state.capital_history.append(st.session_state.capital)
+                            st.error("爆牌了！")
+                        
+                        # 使用 spinner 来提供更好的视觉反馈
+                        with st.spinner("更新游戏状态..."):
+                            time.sleep(0.5)  # 给用户一点时间看到新牌
                             st.rerun()
                 
                 with col_stand:
