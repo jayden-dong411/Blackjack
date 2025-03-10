@@ -237,6 +237,18 @@ def generate_probability_chart(player_value):
     bust_prob = calculate_bust_probability(player_value)
     hit_expected = calculate_hit_expected_value(player_value)
     plt.style.use('default')  # 使用默认样式
+    
+    # 重新设置中文字体配置
+    system = platform.system()
+    if system == 'Windows':
+        plt.rcParams['font.sans-serif'] = ['Microsoft YaHei', 'SimHei']
+    elif system == 'Darwin':  # macOS
+        plt.rcParams['font.sans-serif'] = ['Arial Unicode MS', 'PingFang HK']
+    else:  # Linux
+        plt.rcParams['font.sans-serif'] = ['WenQuanYi Micro Hei', 'DejaVu Sans']
+    plt.rcParams['axes.unicode_minus'] = False
+    plt.rcParams['font.family'] = 'sans-serif'
+    
     fig, ax = plt.subplots(figsize=(8, 4))
     
     # 绘制爆牌概率
@@ -267,6 +279,18 @@ def generate_win_probability_chart(player_value, dealer_card):
     """生成当前局面的胜率图表"""
     win_prob = calculate_win_probability(player_value, dealer_card)
     plt.style.use('default')  # 使用默认样式
+    
+    # 重新设置中文字体配置
+    system = platform.system()
+    if system == 'Windows':
+        plt.rcParams['font.sans-serif'] = ['Microsoft YaHei', 'SimHei']
+    elif system == 'Darwin':  # macOS
+        plt.rcParams['font.sans-serif'] = ['Arial Unicode MS', 'PingFang HK']
+    else:  # Linux
+        plt.rcParams['font.sans-serif'] = ['WenQuanYi Micro Hei', 'DejaVu Sans']
+    plt.rcParams['axes.unicode_minus'] = False
+    plt.rcParams['font.family'] = 'sans-serif'
+    
     fig, ax = plt.subplots(figsize=(8, 4))
     
     # 绘制胜率
@@ -345,6 +369,18 @@ def main():
             "局数": range(len(st.session_state.capital_history)),
             "资本": st.session_state.capital_history
         })
+        
+        # 重新设置中文字体配置
+        system = platform.system()
+        if system == 'Windows':
+            plt.rcParams['font.sans-serif'] = ['Microsoft YaHei', 'SimHei']
+        elif system == 'Darwin':  # macOS
+            plt.rcParams['font.sans-serif'] = ['Arial Unicode MS', 'PingFang HK']
+        else:  # Linux
+            plt.rcParams['font.sans-serif'] = ['WenQuanYi Micro Hei', 'DejaVu Sans']
+        plt.rcParams['axes.unicode_minus'] = False
+        plt.rcParams['font.family'] = 'sans-serif'
+        
         fig, ax = plt.subplots(figsize=(4, 2))
         ax.plot(capital_df["局数"], capital_df["资本"], marker='o', markersize=3)
         ax.set_xlabel("局数")
