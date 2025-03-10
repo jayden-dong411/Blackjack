@@ -8,7 +8,8 @@ import base64
 from PIL import Image
 import io
 import os
-
+plt.rcParams['font.sans-serif'] = ['Arial Unicode MS']
+plt.rcParams['axes.unicode_minus'] = False
 # 设置页面配置
 st.set_page_config(
     page_title="二十一点交互式模拟",
