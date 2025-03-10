@@ -431,14 +431,26 @@ def main():
                 with col_hit:
                     if st.button("要牌 (Hit)", key="hit"):
                         # 玩家要牌
-                        new_card = st.session_state.deck.deal()
-                        st.session_state.player_hand.append(new_card)
+                        new_player_card = st.session_state.deck.deal()
+                        st.session_state.player_hand.append(new_player_card)
                         player_value = calculate_hand_value(st.session_state.player_hand)
                         
-                        # 显示更新后的手牌
-                        st.markdown("玩家手牌更新：")
-                        st.markdown(display_hand(st.session_state.player_hand), unsafe_allow_html=True)
-                        st.write(f"当前点数: {player_value}")
+                        # 显示玩家新牌
+                        st.markdown("玩家要牌：")
+                        st.markdown(display_card(new_player_card), unsafe_allow_html=True)
+                        st.write(f"玩家当前点数: {player_value}")
+                        
+                        # 庄家按规则要牌
+                        dealer_value = calculate_hand_value(st.session_state.dealer_hand)
+                        if dealer_strategy(dealer_value):
+                            new_dealer_card = st.session_state.deck.deal()
+                            st.session_state.dealer_hand.append(new_dealer_card)
+                            dealer_value = calculate_hand_value(st.session_state.dealer_hand)
+                            
+                            # 显示庄家新牌
+                            st.markdown("庄家要牌：")
+                            st.markdown(display_card(new_dealer_card), unsafe_allow_html=True)
+                            st.write(f"庄家明牌点数: {card_values[st.session_state.dealer_hand[1][:-1]]}")
                         
                         # 检查是否爆牌
                         if player_value > 21:
@@ -449,10 +461,18 @@ def main():
                             st.session_state.capital -= bet_amount
                             st.session_state.capital_history.append(st.session_state.capital)
                             st.error("爆牌了！")
+                        elif dealer_value > 21:
+                            # 庄家爆牌，玩家获胜
+                            st.session_state.game_result = "win"
+                            st.session_state.games_played += 1
+                            st.session_state.games_won += 1
+                            st.session_state.capital += bet_amount
+                            st.session_state.capital_history.append(st.session_state.capital)
+                            st.success("庄家爆牌，你赢了！")
                         
                         # 使用 spinner 来提供更好的视觉反馈
                         with st.spinner("更新游戏状态..."):
-                            time.sleep(0.5)  # 给用户一点时间看到新牌
+                            time.sleep(1)  # 给用户更多时间看到新牌
                             st.rerun()
                 
                 with col_stand:
