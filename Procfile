@@ -1,0 +1,1 @@
+web: streamlit run blackjack_interactive.py --server.port=$PORT --server.address=0.0.0.0 
