@@ -487,21 +487,46 @@ def main():
 
                 # 显示庄家行动对话框
                 if st.session_state.show_dealer_dialog:
-                    with st.dialog("庄家行动过程"):
+                    # 创建一个类似对话框的容器
+                    dialog_container = st.container()
+                    
+                    # 添加对话框样式
+                    st.markdown("""
+                    <style>
+                    .dialog-container {
+                        background-color: white;
+                        padding: 20px;
+                        border-radius: 10px;
+                        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+                        margin: 10px 0;
+                        border: 1px solid #ddd;
+                    }
+                    </style>
+                    """, unsafe_allow_html=True)
+                    
+                    with dialog_container:
+                        st.markdown('<div class="dialog-container">', unsafe_allow_html=True)
+                        
+                        # 标题和关闭按钮
+                        col1, col2 = st.columns([5,1])
+                        with col1:
+                            st.markdown("### 庄家行动过程")
+                        with col2:
+                            if st.button("✕", key="close_dialog"):
+                                st.session_state.show_dealer_dialog = False
+                                st.rerun()
+                        
                         # 显示庄家完整手牌
-                        st.markdown("庄家手牌：")
+                        st.markdown("#### 庄家手牌")
                         st.markdown(display_hand(st.session_state.dealer_hand), unsafe_allow_html=True)
                         
                         # 显示庄家行动过程
-                        st.markdown("### 庄家行动详情")
+                        st.markdown("#### 行动详情")
                         for action in st.session_state.dealer_actions:
                             st.write(action)
                             time.sleep(0.5)  # 逐步显示庄家行动
                         
-                        # 添加关闭按钮
-                        if st.button("关闭", key="close_dialog"):
-                            st.session_state.show_dealer_dialog = False
-                            st.rerun()
+                        st.markdown('</div>', unsafe_allow_html=True)
                 
                 # 如果庄家已完成行动但游戏还未结束，显示"显示最终结果"按钮
                 if st.session_state.dealer_finished and st.session_state.game_result is None:
