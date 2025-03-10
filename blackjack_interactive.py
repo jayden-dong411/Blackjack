@@ -8,6 +8,7 @@ import base64
 from PIL import Image
 import io
 import os
+import platform
 
 # 根据操作系统设置合适的中文字体
 system = platform.system()
